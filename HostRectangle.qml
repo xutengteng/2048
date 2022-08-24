@@ -82,20 +82,26 @@ Rectangle{
     property var rand_num
     function random_rec(){
         var zero = 0
-        for(var i=0;i<16;i++){
+        for(var i=0;i<16;i++){//寻找空闲位
             if(item.itemArray[i] === 0){
                 freeArray[zero] = i
                 zero++
             }
         }
-        rand_pos = Math.floor(Math.random()*zero)
-        console.log("rand_pos:",rand_pos)
-        rand_num = Math.pow(2,Math.floor(Math.random()*3)+1)
-        item.itemArray[freeArray[rand_pos]] = rand_num
-        console.log("rand_num:",rand_num)
-        freeArray={}
+        if(zero !== 0){//仍有空位
+            rand_pos = Math.floor(Math.random()*zero)
+            console.log("rand_pos:",rand_pos+1)
+            rand_num = Math.pow(2,Math.floor(Math.random()*3)+1)
+            item.itemArray[freeArray[rand_pos]] = rand_num
+            console.log("rand_num:",rand_num)
+            freeArray={}
+        }else//无空位，退出
+        {
+            console.error("game over")
+        }
+
     }
-    /*处理滑动，计算新的位置*/
+    /*处理滑动，合并算法*/
     Connections{
         target: host
         function onSlide_left(){
