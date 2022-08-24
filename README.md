@@ -1,12 +1,26 @@
 # 2048 GAME
 
-## DEBUG FINISH
+## MODULE
 
-* 2022-8-18		main.qml:		调用显示
-* 2022-8-19 	RandomRec.qml:	滑动产生随机方块
-* 2022-8-21 	List.qml:		接收数据矩阵，滑动刷新所有方块（4*4）
+### main.qml
 
-## WAIT FOR
+* 调用显示
 
-* HostRectangle.qml:  	合并算法（部分完成）
-* other：				随机方块和数据矩阵的交互方式（存疑）
+### RandomRec.qml（未用）
+
+* 滑动产生随机方块
+
+### List.qml
+
+* 接收新布局，刷新所有方块（4*4）
+
+### HostRectangle.qml
+
+* 合并算法（部分完成）
+* 在闲置位置上产生随即方块
+* 生成新的布局
+
+
+##待优化
+
+* 随机方块延时产生
