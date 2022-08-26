@@ -16,12 +16,14 @@ Rectangle{
     property int lbs
     signal itemsig(var a)
     signal slide_left()
-
+    signal slide_right()
+    signal slide_up()
+    signal slide_down()
 
     /*数据*/
     Item {
         id: item
-        property var itemArray:[2,2,2,2,0,0,4,4,8,0,0,8,16,0,16,0]
+        property var itemArray:[0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0]
     }
 
     /*布局格子*/
@@ -64,15 +66,17 @@ Rectangle{
                 console.log("左划")
             }
             if((axis==mx)&&(polar==0)) {
+                slide_right()
                 console.log("右划")
             }
             if((axis==my)&&(polar==1)) {
+                slide_up()
                 console.log("上划")
             }
             if((axis==my)&&(polar==0)) {
+                slide_down()
                 console.log("下划")
             }
-
         }
     }
 
@@ -99,29 +103,142 @@ Rectangle{
         {
             console.error("game over")
         }
+    }
+
+
+    /******************统一矩阵，简化算法*******************/
+    function r_2_l(){
+        var i=0
+        var dt0,dt1,dt2,dt3
+        for(i;i<4;i++){
+            dt0 = item.itemArray[0+i*4]
+            dt1 = item.itemArray[1+i*4]
+            dt2 = item.itemArray[2+i*4]
+            dt3 = item.itemArray[3+i*4]
+            item.itemArray[0+i*4] = dt3
+            item.itemArray[1+i*4] = dt2
+            item.itemArray[2+i*4] = dt1
+            item.itemArray[3+i*4] = dt0
+        }
+    }
+    function u_2_l(){
+        var i=0
+        var dt1,dt2,dt3,dt6,dt7,dt11
+        dt1 = item.itemArray[1]
+        dt2 = item.itemArray[2]
+        dt3 = item.itemArray[3]
+        dt6 = item.itemArray[6]
+        dt7 = item.itemArray[7]
+        dt11 = item.itemArray[11]
+        item.itemArray[1] = item.itemArray[4]
+        item.itemArray[2] = item.itemArray[8]
+        item.itemArray[3] = item.itemArray[12]
+        item.itemArray[6] = item.itemArray[9]
+        item.itemArray[7] = item.itemArray[13]
+        item.itemArray[11]= item.itemArray[14]
+        item.itemArray[4] = dt1
+        item.itemArray[8] = dt2
+        item.itemArray[12]= dt3
+        item.itemArray[9] = dt6
+        item.itemArray[13]= dt7
+        item.itemArray[14]= dt11
+    }
+    function d_2_l(mode){
+        if(mode === "end"){
+            r_2_l()
+            u_2_l()
+        }
+        if(mode === "start"){
+            u_2_l()
+            r_2_l()
+        }
 
     }
-    /*处理滑动，合并算法*/
-    Connections{
-        target: host
-        function onSlide_left(){
-            var i=0
+    /*************************缩进***********************/
+    function move_retract(){
+        var i=0
+
+        for(i;i<4;i++){
+            if(item.itemArray[0+i*4] === 0){
+                item.itemArray[0+i*4] = item.itemArray[1+i*4]
+                item.itemArray[1+i*4] = item.itemArray[2+i*4]
+                item.itemArray[2+i*4] = item.itemArray[3+i*4]
+                item.itemArray[3+i*4] = 0
+            }
+            if(item.itemArray[1+i*4] === 0){
+                item.itemArray[1+i*4] = item.itemArray[2+i*4]
+                item.itemArray[2+i*4] = item.itemArray[3+i*4]
+                item.itemArray[3+i*4] = 0
+            }
+            if(item.itemArray[2+i*4] === 0){
+                item.itemArray[2+i*4] = item.itemArray[3+i*4]
+                item.itemArray[3+i*4] = 0
+            }
+        }
+
+    }
+
+    /***************************合并***********************/
+    function add(){
+        var i=0
+        for(i;i<4;i++)
+        {
+            move_retract()
             if(item.itemArray[0+i*4]===item.itemArray[1+i*4]){//1=2
                 item.itemArray[0+i*4] = 2*item.itemArray[0+i*4]
                 item.itemArray[1+i*4] = 0
                 if(item.itemArray[2+i*4]===item.itemArray[3+i*4]){//3=4
-                    item.itemArray[2+i*4] = 2*item.itemArray[2+i*4]
+                    item.itemArray[1+i*4] = 2*item.itemArray[2+i*4]
+                    item.itemArray[2+i*4] = 0
                     item.itemArray[3+i*4] = 0
                 }
             }else if(item.itemArray[1+i*4]===item.itemArray[2+i*4]){//2=3
                 item.itemArray[1+i*4] = 2*item.itemArray[1+i*4]
+                item.itemArray[2+i*4] = item.itemArray[3+i*4]
                 item.itemArray[2+i*4] = 0
             }else if(item.itemArray[2+i*4]===item.itemArray[3+i*4]){//3=4
                 item.itemArray[2+i*4] = 2*item.itemArray[2+i*4]
                 item.itemArray[3+i*4] = 0
             }
+            move_retract()
+        }
+    }
+    /**************************处理滑动，合并算法***************************/
+    Connections{
+        target: host
+        function onSlide_left(){
+            add()
             random_rec()
-            //rand.state = "slide"
+            itemsig(item.itemArray)
+        }
+    }
+    Connections{
+        target: host
+        function onSlide_right(){
+            r_2_l()
+            add()
+            r_2_l()
+            random_rec()
+            itemsig(item.itemArray)
+        }
+    }
+    Connections{
+        target: host
+        function onSlide_up(){
+            u_2_l()
+            add()
+            u_2_l()
+            random_rec()
+            itemsig(item.itemArray)
+        }
+    }
+    Connections{
+        target: host
+        function onSlide_down(){
+            d_2_l("start")
+            add()
+            d_2_l("end")
+            random_rec()
             itemsig(item.itemArray)
         }
     }
