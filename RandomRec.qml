@@ -65,18 +65,18 @@ Rectangle{
         }
     ]
     //通知布局器随机方块信息
-    signal random_finsh(int a,int b)
+    signal random_finish(int a,int b)
 
     onRandChanged: {
         if (randrec.state === "slide") {
-            random_finsh(rand_pos,rand_num)//打印的是上一个的
+            random_finish(rand_pos,rand_num)//打印的是上一个的
         }
     }
 }
 //    /*随机方块位置*/
 //    Connections{
 //        target: rand
-//        function onRandom_finsh(a,b){
+//        function onRandom_finish(a,b){
 //            console.log(a,b)
 //            //item.itemArray[a-1] = b
 //        }

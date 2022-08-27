@@ -14,10 +14,13 @@ Window {
     color: "white"
 
     ScoreRec{
+        id:socre_page
         x:30
         y:60
     }
+
     HostRectangle{
+        id:host_page
         //x:30
         y:200
         anchors.horizontalCenter: parent.horizontalCenter
